@@ -1,0 +1,22 @@
+{
+  "name": "repo-s1",
+  "version": "1.0.0",
+  "description": "P6",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mugen-AOR/Repo-S1.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Mugen-AOR/Repo-S1/issues"
+  },
+  "homepage": "https://github.com/Mugen-AOR/Repo-S1#readme",
+  "devDependencies": {
+    "gulp": "^4.0.2"
+  }
+}
