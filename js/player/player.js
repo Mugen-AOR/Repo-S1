@@ -1,4 +1,4 @@
-class player {
+class Player {
     constructor(id, column, row, weapon){
         this.id = id;
         this.column = column;
@@ -31,6 +31,6 @@ class player {
     }
 
     update(){
-        
+
     }
 }
