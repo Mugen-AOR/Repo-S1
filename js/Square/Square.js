@@ -1,4 +1,8 @@
 class Square {
+    /**
+     * classe Square
+     * @constructor
+     */
     constructor(){
         this.osbtacle = fasle;
         this.weapon = null;

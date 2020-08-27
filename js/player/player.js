@@ -1,4 +1,13 @@
-class Player {
+ class Player {
+     /**
+ * classe Player
+ * @constructor
+ * @param   {number}  id      [Id du joueur]
+ * @param   {string}  column  [Lettre de la colonne]
+ * @param   {number}  row     [Numéro de la ligne]
+ * @param   {string}  weapon  [Nom de l'arme]
+ *
+ */
     constructor(id, column, row, weapon){
         this.id = id;
         this.column = column;
