@@ -7,16 +7,16 @@ const concat     = require("gulp-concat");
 function style(){
   return gulp.src("./src/**/*.scss")
     .pipe(sass())
-    .pipe(concat('style.css'))
-    .pipe(gulp.dest('./app/css'));
+    .pipe(concat("style.css"))
+    .pipe(gulp.dest("./app/css"));
 }
 
 function build(){
   return gulp.src("./src/**/*.scss")
     .pipe(sass())
-    .pipe(concat('style.css'))
+    .pipe(concat("style.css"))
     .pipe(cleanCSS())
-    .pipe(gulp.dest('./app/css'));
+    .pipe(gulp.dest("./app/css"));
 }
 
 function watch(){
@@ -25,8 +25,8 @@ function watch(){
       baseDir : "./app"
     }
   });
-//   gulp.watch("./src/**/*.scss", style);
-//   gulp.watch("./app/").on("change", browerSync.reload);
+  gulp.watch("./src/**/*.scss", style);
+  gulp.watch("./app/").on("change", browerSync.reload);
 }
 
 exports.build = build;
