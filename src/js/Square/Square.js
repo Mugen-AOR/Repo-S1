@@ -4,7 +4,7 @@ class Square {
    * @constructor
    */
   constructor() {
-    this.osbtacle = fasle;
+    this.osbtacle = false;
     this.weapon = null;
     this.playerId = null;
     this.accessible = true;
