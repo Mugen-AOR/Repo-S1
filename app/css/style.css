@@ -1,0 +1,12 @@
+square {
+  border: 1px solid grey;
+  width: 2rem;
+  height: 2rem;
+  display: block; }
+  square.obstacle {
+    background-color: grey; }
+
+board {
+  display: flex;
+  flex-wrap: wrap;
+  margin: auto; }
