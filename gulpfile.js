@@ -5,24 +5,24 @@ const browerSync = require("browser-sync");
 const concat     = require("gulp-concat");
 
 function style(){
-  return gulp.src("./js/**/*.scss")
+  return gulp.src("./src/js/**/*.scss")
     .pipe(sass())
-    .pipe(concat('style.css'))
-    .pipe(gulp.dest('./app/css'));
+    .pipe(concat("style.css"))
+    .pipe(gulp.dest("./app/css"));
 }
 
 function build(){
-  return gulp.src("./js/**/*.scss")
+  return gulp.src("./src/js/**/*.scss")
     .pipe(sass())
-    .pipe(concat('style.css'))
+    .pipe(concat("style.css"))
     .pipe(cleanCSS())
-    .pipe(gulp.dest('./app/css'));
+    .pipe(gulp.dest("./app/css"));
 }
 
 function makeJsFile(){
-  return gulp.src("./js/**/*.js")
-    .pipe(concat('p6.js'))
-    .pipe(gulp.dest('./app/js'));
+  return gulp.src("./src/js/**/*.js")
+    .pipe(concat("p6.js"))
+    .pipe(gulp.dest("./app/js"));
 }
 
 function watch(){
@@ -31,8 +31,8 @@ function watch(){
       baseDir : "./app"
     }
   });
-  gulp.watch("./js/**/*.scss", style);
-  gulp.watch("./js/**/*.js", makeJsFile);
+  gulp.watch("./src/js/**/*.scss", style);
+  gulp.watch("./src/js/**/*.js", makeJsFile);
   gulp.watch("./app/").on("change", browerSync.reload);
 }
 

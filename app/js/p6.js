@@ -1,11 +1,5 @@
-class Component{
-  constructor(name, tagName, domTarget){
-    this.name = name;
-    this.DOM = document.createElement(tagName);
-    domTarget.appendChild(this.DOM);
-    window.game[name] = this;
-  }
-}
+/* global game */
+
 class GameMaster {
     /**
      * classe GameMaster
@@ -18,14 +12,17 @@ class GameMaster {
      *
      */
     constructor(rowNmbr, columnNmbr, obstacleNmbr, playerNmbr, weapons){
-        this.rowNmbr = rowNmbr;
-        this.columnNmbr = columnNmbr;
+        this.rowNmbr      = rowNmbr;
+        this.columnNmbr   = columnNmbr;
         this.obstacleNmbr = obstacleNmbr;
-        this.playerNmbr = playerNmbr;
-        this.weapons = weapons;
+        this.playerNmbr   = playerNmbr;
+        this.weapons      = weapons;
         this.activePlayer = Player.name;
+
         this.generateMap();
         this.generateObstacles();
+        this.gerenatePlayers();
+        game.gameMaster = this;
     }
 
     displayDirection(){
@@ -51,14 +48,28 @@ class GameMaster {
      * @return  {string}       [return description]
      */
     generateSquareName(row, col){
-        const ref = ["a","b", "c", "d", "e", "f", "g"];
-        return ref[row]+""+col;
+        console.log(row, col)
+        return `case${row}.${col}`;
     }
+
+    /**
+     * [extractCasePositionFromId description]
+     *
+     * @param   {string}  id  [id description]
+     *
+     * @return  {JSON}      {row: number, letter:number}
+     */
+    extractCasePositionFromId(id){
+        id= id.slice("case".length);
+        id = id.split(".");
+        return {"col":parseInt(id[1]), "row":parseInt(id[0])};
+    }
+
 
     generateObstacles(){
         let caseName;
         for( let i=0; i<this.obstacleNmbr; i++){
-            caseName = this.generateSquareName(Math.floor(Math.random()*this.rowNmbr), Math.floor(Math.random()*this.columnNmbr));
+            caseName = this.randomCase;
             if( ! game[caseName].addObstacle()) i--;
         }
     }
@@ -67,8 +78,20 @@ class GameMaster {
 
     }
 
-    GerenatePlayers(){
-
+    gerenatePlayers(){
+        let idCase;
+        let error;
+        let cases;
+        for(let i=0; i<this.playerNmbr; i++){
+            idCase = this.randomCase;
+            cases = this.casesReachable(idCase,1);
+            console.log(cases);
+            cases.push(idCase);
+            for (let ii=0, size = cases.length; ii<size; ii++){
+                if(cases[ii].obstacle ) error = true;
+            }
+            if(game[idCase].playerId !== null || error) i--;
+        }
     }
 
     nextTurn(){
@@ -82,30 +105,122 @@ class GameMaster {
     combatMode(){
 
     }
+    
+    /**
+     * [casesReachable description]
+     *
+     * @param   {string}  startPoint  [startPoint description]
+     * @param   {number}  depth       [depth description]
+     *
+     * @return  {Array}              [return description]
+     */
+    casesReachable(startPoint, depth){
+       const {col, row} = this.extractCasePositionFromId(startPoint);
+       console.log(col, row)
+       let reachable = [];
+       let variable;
+       for( let i=1; i<=depth; i++){
+           variable = col - 1 * depth;
+        //    console.log("->",this.generateSquareName(row, variable));
+           if(variable > 0 ) reachable.push(this.generateSquareName(row, variable));
+           variable = col +1 * depth;
+        //    console.log("->",this.generateSquareName(row, variable));
+           if(variable <= this.columnNmbr ) reachable.push(this.generateSquareName(row, variable));
+           variable = row + 1 * depth;
+           console.log("****",variable, this.rowNmbr);
+           if(variable <= this.rowNmbr ) reachable.push(this.generateSquareName(variable, col));
+           variable = row - 1 * depth;
+        //    console.log("->",this.generateSquareName(variable, col));
+           if(variable > 0 ) reachable.push(this.generateSquareName(variable, col));
+       }
+       console.log(startPoint,reachable);
+       return reachable;
+
+    }
+
+    /**
+     * [randomCase description]
+     *
+     * @return  {string}  [return description]
+     */
+    get randomCase(){
+        return  this.generateSquareName(Math.floor(Math.random()*this.rowNmbr), Math.floor(Math.random()*this.columnNmbr));
+    }
 }
-class Square extends Component{
+class Player {
+  /**
+* classe Player
+* @constructor
+* @param   {number}  id      [Id du joueur]
+* @param   {string}  column  [Lettre de la colonne]
+* @param   {number}  row     [Numéro de la ligne]
+* @param   {string}  weapon  [Nom de l'arme]
+*
+*/
+  constructor(id, column, row, weapon) {
+    this.id = id;
+    this.column = column;
+    this.row = row;
+    this.weapon = weapon;
+    this.hp = 100;
+    this.defenseMode = false;
+    this.combat = false;
+    this.name = "joueur " + id;
+  }
+
+  move() {
+
+  }
+
+  switchWeapon() {
+
+  }
+
+  attack() {
+
+  }
+
+  defend() {
+
+  }
+
+  isAttacked() {
+
+  }
+
+  update() {
+
+  }
+}
+class Square extends Component {
     /**
      * classe Square
      * @constructor
      */
-    constructor(name, row, col, target){
-        super(name,"square", target)
-        this.osbtacle   = false;
-        this.weapon     = null;
-        this.playerId   = null;
+    constructor(name, row, col, target) {
+        super(name, "square", target)
+        this.osbtacle = false;
+        this.weapon = null;
+        this.playerId = null;
         this.accessible = true;
         this.DOM.innerHTML = name;
     }
 
-    isAccessible(){
+    /**
+     * allow to know if this case is accessible when we check for deplacement list
+     *
+     * @return  {boolean}  [return description]
+     */
+    isAccessible() {
+        if (this.playerId !== null || this.osbtacle) return false;
+        return true;
+    }
+
+    click() {
 
     }
 
-    click(){
-
-    }
-
-    render(){
+    render() {
         if (this.osbtacle) return this.templateObstacle();
     }
 
@@ -114,59 +229,14 @@ class Square extends Component{
      *
      * @return  {boolean}  [return description]
      */
-    addObstacle(){
+    addObstacle() {
         if (this.osbtacle) return false;
         this.osbtacle = true;
         this.render();
         return true;
     }
 
-    templateObstacle(){
+    templateObstacle() {
         this.DOM.className = "obstacle";
-    }
-}
- class Player {
-     /**
- * classe Player
- * @constructor
- * @param   {number}  id      [Id du joueur]
- * @param   {string}  column  [Lettre de la colonne]
- * @param   {number}  row     [Numéro de la ligne]
- * @param   {string}  weapon  [Nom de l'arme]
- *
- */
-    constructor(id, column, row, weapon){
-        this.id = id;
-        this.column = column;
-        this.row = row;
-        this.weapon = weapon;
-        this.hp = 100;
-        this.defenseMode = fasle;
-        this.combat = false;
-        this.name = "joueur " + id;
-    }
-
-    move(){
-
-    }
-
-    switchWeapon(){
-
-    }
-
-    attack(){
-
-    }
-
-    defend(){
-
-    }
-
-    isAttacked(){
-
-    }
-
-    update(){
-
     }
 }
