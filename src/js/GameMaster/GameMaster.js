@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* global game Square */
+/* global game Square Player */
 
 class GameMaster {
   /**
@@ -31,7 +31,7 @@ class GameMaster {
 
   generateMap() {
     const board = document.querySelector("board");
-    board.style = `width: calc(${this.columnNmbr*2}rem + ${this.columnNmbr*2}px);`;
+    board.style = `width: calc(${this.columnNmbr*2}rem + ${this.columnNmbr*2}px);`; //TODO: remplacer ce 2 en dur apr une variable
     for (let row = 0; row < this.rowNmbr; row++) {
       for (let col = 0; col < this.columnNmbr; col++) {
         new Square(this.generateSquareName(row, col), row, col, board);
@@ -52,31 +52,13 @@ class GameMaster {
   }
 
   /**
-   * [extractCasePositionFromId description]
-   *
-   * @param   {string}  id  [id description]
-   *
-   * @return  {object}      {row: number, letter:number}
-   */
-  extractCasePositionFromId(id) {
-    const result = id.slice("case".length)
-      .split(".");
-    return {
-      "col": parseInt(result[1]),
-      "row": parseInt(result[0])
-    };
-  }
-
-  /**
-   * place obsctalces on board
+   * add obsctalces on board
    *
    * @return  {void}
    */
   generateObstacles() {
-    let caseName;
     for (let i = 0; i < this.obstacleNmbr; i++) {
-      caseName = this.randomCase;
-      if (! game[caseName].addObstacle()) i--;
+      if (! game[this.randomCase].addObstacle()) i--;
     }
   }
 
@@ -84,18 +66,38 @@ class GameMaster {
 
   }
 
+  /**
+   * add player on the board
+   *
+   * @return  {void}
+   */
   gerenatePlayers() {
-    let idCase;
-    let error;
-    let cases;
+    let 
+      cases,
+      error,
+      idCase,
+      obstacles;
+
     for (let i = 0; i < this.playerNmbr; i++) {
-      idCase = this.randomCase;
-      cases = this.casesReachable(idCase, 1);
-      cases.push(idCase);
+      idCase    = this.randomCase;
+      cases     = this.casesReachable(idCase, 1, true);
+      error     = false;
+      obstacles = 0;
+
+      //check around selected case
       for (let ii = 0, size = cases.length; ii < size; ii++) {
-        if (cases[ii].obstacle) error = true;
+        if (game[cases[ii]].obstacle) obstacles++;
+        if (game[cases[ii]].playerId !== null) error = true;
       }
-      if (game[idCase].playerId !== null || error) i--;
+      //check selected case
+      if (game[idCase].obstacle || game[idCase].playerId !== null) error = true;
+      
+      if (obstacles === 4 || error) {
+        i--;
+        continue;
+      }
+      new Player(i+1,idCase,""); //TODO : definir l'arme par défaut lors de l'instanciation
+      game[idCase].update("playerId",i+1);
     }
   }
 
@@ -116,31 +118,38 @@ class GameMaster {
    *
    * @param   {string}  startPoint  [startPoint description]
    * @param   {number}  depth       [depth description]
+   * @param   {boolean} [arr]       pointer if we need or not an array as anwser
    *
-   * @return  {Array}              [return description]
+   * @return  {Array|object}
    */
-  casesReachable(startPoint, depth) {
-    const { col, row } = this.extractCasePositionFromId(startPoint);
-    console.log(col, row);
-    let reachable = [];
+  casesReachable(startPoint, depth, arr=false) {
+    const
+      bottom = [],
+      col    = game[startPoint].col,
+      left   = [],
+      right  = [],
+      row    = game[startPoint].row,
+      top    = [];
     let variable;
     for (let i = 1; i <= depth; i++) {
-      variable = col - 1 * depth;
-      //    console.log("->",this.generateSquareName(row, variable));
-      if (variable > 0) reachable.push(this.generateSquareName(row, variable));
-      variable = col + 1 * depth;
-      //    console.log("->",this.generateSquareName(row, variable));
-      if (variable <= this.columnNmbr) reachable.push(this.generateSquareName(row, variable));
-      variable = row + 1 * depth;
-      console.log("****", variable, this.rowNmbr);
-      if (variable <= this.rowNmbr) reachable.push(this.generateSquareName(variable, col));
-      variable = row - 1 * depth;
-      //    console.log("->",this.generateSquareName(variable, col));
-      if (variable > 0) reachable.push(this.generateSquareName(variable, col));
+      variable = col - i;
+      if (variable >= 0) left.push(this.generateSquareName(row, variable));
+      variable = col + i;
+      if (variable < this.columnNmbr) right.push(this.generateSquareName(row, variable));
+      variable = row + i;
+      if (variable < this.rowNmbr) bottom.push(this.generateSquareName(variable, col));
+      variable = row - i;
+      if (variable > 0) top.push(this.generateSquareName(variable, col));
     }
-    console.log(startPoint, reachable);
-    return reachable;
-
+    if (arr) return bottom.concat(left)
+      .concat(right)
+      .concat(top);
+    return  {
+      "bottom": bottom, 
+      "left"  : left, 
+      "right" : right,
+      "top"   : top 
+    };
   }
 
   /**

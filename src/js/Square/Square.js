@@ -7,11 +7,13 @@ class Square extends Component {
    */
   constructor(name, row, col, target) {
     super(name, "square", target);
-    this.osbtacle = false;
-    this.weapon = null;
-    this.playerId = null;
-    this.accessible = true;
-    this.DOM.innerHTML = name;
+    this.osbtacle      = false;
+    this.weapon        = null;
+    this.playerId      = null;
+    this.accessible    = true;
+    this.col           = col;
+    this.row           = row;
+    this.DOM.innerHTML = `${row}|${col}`;
   }
 
   /**
@@ -30,6 +32,7 @@ class Square extends Component {
 
   render() {
     if (this.osbtacle) return this.templateObstacle();
+    if (this.playerId !== null) return this.templatePlayer();
   }
 
   /**
@@ -46,5 +49,14 @@ class Square extends Component {
 
   templateObstacle() {
     this.DOM.className = "obstacle";
+  }
+
+  templatePlayer(){
+    this.DOM.className = "player"+this.playerId;
+  }
+
+  update(property, value){
+    this[property] = value;
+    this.render();
   }
 }

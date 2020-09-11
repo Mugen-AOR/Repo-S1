@@ -5,6 +5,10 @@ square {
   display: block; }
   square.obstacle {
     background-color: grey; }
+  square.player1 {
+    background-color: blue; }
+  square.player2 {
+    background-color: red; }
 
 board {
   display: flex;
