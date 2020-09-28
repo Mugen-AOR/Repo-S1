@@ -9,6 +9,8 @@ square {
     background-color: blue; }
   square.player2 {
     background-color: red; }
+  square.mystery-weapon {
+    background-color: pink; }
 
 board {
   display: flex;

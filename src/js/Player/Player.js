@@ -1,3 +1,5 @@
+/* global game */
+
 class Player {
   /**
 * classe Player
@@ -16,6 +18,7 @@ class Player {
     this.id          = id;
     this.name        = "joueur " + id;
     this.weapon      = weapon;
+    this.movement = 3;
   }
 
   move() {
@@ -40,5 +43,10 @@ class Player {
 
   update() {
 
+  }
+
+  play(){
+    this.movements = game.casesReachable(this.currentCase, this.movement, false);
+    console.log(this.movements);
   }
 }

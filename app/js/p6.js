@@ -20,10 +20,13 @@ class GameMaster {
     this.playerNmbr   = playerNmbr;
     this.rowNmbr      = rowNmbr;
     this.weapons      = weapons;
+    this.turn = 0;
 
     this.generateMap();
     this.generateObstacles();
     this.gerenatePlayers();
+    this.generateWeapons();
+    this.nextTurn();
   }
 
   displayDirection() {
@@ -62,8 +65,20 @@ class GameMaster {
     }
   }
 
+  /**
+   * [generateWeapons description]
+   *
+   * @return  {[type]}  [return description]
+   */
   generateWeapons() {
-
+    this.weapons.shift();
+    console.log("weapons", this.weapons);
+    for (let i = 0, size = this.weapons.length, caseId; i < size; i++) {
+      caseId = this.randomCase;
+      console.log("case", caseId, game[caseId].isAccessible());
+      if (game[caseId].isAccessible()) game[caseId].update("weapon", true);
+      else i--;
+    }
   }
 
   /**
@@ -76,7 +91,10 @@ class GameMaster {
       cases,
       error,
       idCase,
-      obstacles;
+      obstacles,
+      playerId
+      ;
+
 
     for (let i = 0; i < this.playerNmbr; i++) {
       idCase    = this.randomCase;
@@ -96,13 +114,23 @@ class GameMaster {
         i--;
         continue;
       }
-      new Player(i+1,idCase,""); //TODO : definir l'arme par défaut lors de l'instanciation
-      game[idCase].update("playerId",i+1);
+      playerId = i+1;
+      this["player"+playerId] = new Player(playerId,idCase,this.weapons[0]);
+      game[idCase].update("playerId",playerId);
     }
   }
 
+  /**
+   * change player turn
+   *
+   * @return  {void}  [return description]
+   */
   nextTurn() {
-
+    this.turn++;
+    if (this.turn > this.playerNmbr) this.turn = 1;
+    console.log(this.turn);
+    const player = "player"+this.turn;
+    this[player].play();
   }
 
   gameOver() {
@@ -161,50 +189,6 @@ class GameMaster {
     return this.generateSquareName(Math.floor(Math.random() * this.rowNmbr), Math.floor(Math.random() * this.columnNmbr));
   }
 }
-class Player {
-  /**
-* classe Player
-* @constructor
-* @param   {number}  id      [Id du joueur]
-* @param   {string}  column  [Lettre de la colonne]
-* @param   {number}  row     [Numéro de la ligne]
-* @param   {string}  weapon  [Nom de l'arme]
-*
-*/
-  constructor(id, currentCase, weapon) {
-    this.combat      = false;
-    this.currentCase = currentCase,
-    this.defenseMode = false;
-    this.hp          = 100;
-    this.id          = id;
-    this.name        = "joueur " + id;
-    this.weapon      = weapon;
-  }
-
-  move() {
-
-  }
-
-  switchWeapon() {
-
-  }
-
-  attack() {
-
-  }
-
-  defend() {
-
-  }
-
-  isAttacked() {
-
-  }
-
-  update() {
-
-  }
-}
 /* global Component */
 
 class Square extends Component {
@@ -238,8 +222,10 @@ class Square extends Component {
   }
 
   render() {
-    if (this.osbtacle) return this.templateObstacle();
-    if (this.playerId !== null) return this.templatePlayer();
+    if (this.osbtacle)          return this.DOM.className = "obstacle";
+    if (this.playerId !== null) return this.DOM.className = "player"+this.playerId;
+    if (this.weapon === true)   return this.DOM.className = "mystery-weapon";
+    if (this.weapon !== null)   return this.DOM.className = "weapon-"+this.weapon.name;
   }
 
   /**
@@ -254,16 +240,68 @@ class Square extends Component {
     return true;
   }
 
-  templateObstacle() {
-    this.DOM.className = "obstacle";
-  }
+  // templateObstacle() {
+  //   this.DOM.className = "obstacle";
+  // }
 
-  templatePlayer(){
-    this.DOM.className = "player"+this.playerId;
-  }
+  // templatePlayer(){
+  //   this.DOM.className = "player"+this.playerId;
+  // }
 
   update(property, value){
     this[property] = value;
     this.render();
+  }
+}
+/* global game */
+
+class Player {
+  /**
+* classe Player
+* @constructor
+* @param   {number}  id      [Id du joueur]
+* @param   {string}  column  [Lettre de la colonne]
+* @param   {number}  row     [Numéro de la ligne]
+* @param   {string}  weapon  [Nom de l'arme]
+*
+*/
+  constructor(id, currentCase, weapon) {
+    this.combat      = false;
+    this.currentCase = currentCase,
+    this.defenseMode = false;
+    this.hp          = 100;
+    this.id          = id;
+    this.name        = "joueur " + id;
+    this.weapon      = weapon;
+    this.movement = 3;
+  }
+
+  move() {
+
+  }
+
+  switchWeapon() {
+
+  }
+
+  attack() {
+
+  }
+
+  defend() {
+
+  }
+
+  isAttacked() {
+
+  }
+
+  update() {
+
+  }
+
+  play(){
+    this.movements = game.casesReachable(this.currentCase, this.movement, false);
+    console.log(this.movements);
   }
 }

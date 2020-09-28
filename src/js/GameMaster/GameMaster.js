@@ -20,10 +20,13 @@ class GameMaster {
     this.playerNmbr   = playerNmbr;
     this.rowNmbr      = rowNmbr;
     this.weapons      = weapons;
+    this.turn = 0;
 
     this.generateMap();
     this.generateObstacles();
     this.gerenatePlayers();
+    this.generateWeapons();
+    this.nextTurn();
   }
 
   displayDirection() {
@@ -62,8 +65,20 @@ class GameMaster {
     }
   }
 
+  /**
+   * [generateWeapons description]
+   *
+   * @return  {[type]}  [return description]
+   */
   generateWeapons() {
-
+    this.weapons.shift();
+    console.log("weapons", this.weapons);
+    for (let i = 0, size = this.weapons.length, caseId; i < size; i++) {
+      caseId = this.randomCase;
+      console.log("case", caseId, game[caseId].isAccessible());
+      if (game[caseId].isAccessible()) game[caseId].update("weapon", true);
+      else i--;
+    }
   }
 
   /**
@@ -76,7 +91,10 @@ class GameMaster {
       cases,
       error,
       idCase,
-      obstacles;
+      obstacles,
+      playerId
+      ;
+
 
     for (let i = 0; i < this.playerNmbr; i++) {
       idCase    = this.randomCase;
@@ -96,13 +114,23 @@ class GameMaster {
         i--;
         continue;
       }
-      new Player(i+1,idCase,""); //TODO : definir l'arme par défaut lors de l'instanciation
-      game[idCase].update("playerId",i+1);
+      playerId = i+1;
+      this["player"+playerId] = new Player(playerId,idCase,this.weapons[0]);
+      game[idCase].update("playerId",playerId);
     }
   }
 
+  /**
+   * change player turn
+   *
+   * @return  {void}  [return description]
+   */
   nextTurn() {
-
+    this.turn++;
+    if (this.turn > this.playerNmbr) this.turn = 1;
+    console.log(this.turn);
+    const player = "player"+this.turn;
+    this[player].play();
   }
 
   gameOver() {

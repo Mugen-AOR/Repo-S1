@@ -31,8 +31,10 @@ class Square extends Component {
   }
 
   render() {
-    if (this.osbtacle) return this.templateObstacle();
-    if (this.playerId !== null) return this.templatePlayer();
+    if (this.osbtacle)          return this.DOM.className = "obstacle";
+    if (this.playerId !== null) return this.DOM.className = "player"+this.playerId;
+    if (this.weapon === true)   return this.DOM.className = "mystery-weapon";
+    if (this.weapon !== null)   return this.DOM.className = "weapon-"+this.weapon.name;
   }
 
   /**
@@ -47,13 +49,13 @@ class Square extends Component {
     return true;
   }
 
-  templateObstacle() {
-    this.DOM.className = "obstacle";
-  }
+  // templateObstacle() {
+  //   this.DOM.className = "obstacle";
+  // }
 
-  templatePlayer(){
-    this.DOM.className = "player"+this.playerId;
-  }
+  // templatePlayer(){
+  //   this.DOM.className = "player"+this.playerId;
+  // }
 
   update(property, value){
     this[property] = value;
